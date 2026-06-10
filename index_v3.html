@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>三外志愿者交通劝导服务提醒</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 16px; color: #333;
+        }
+        .container { max-width: 520px; margin: 0 auto; }
+        .header { text-align: center; color: white; margin-bottom: 20px; }
+        .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .header .subtitle { font-size: 14px; opacity: 0.9; }
+        .card {
+            background: white; border-radius: 16px; padding: 20px;
+            margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        }
+        .info-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+        .info-tag {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+        }
+
+        /* 身份选择 */
+        .identity-section { text-align: center; padding: 30px 20px; }
+        .identity-section h2 { font-size: 18px; margin-bottom: 20px; color: #444; }
+        .identity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .identity-btn {
+            padding: 18px 12px; border: 2px solid #e0d6f5; border-radius: 14px;
+            background: white; cursor: pointer; transition: all 0.3s ease;
+            text-align: center; font-size: 15px; font-weight: 600; color: #555;
+        }
+        .identity-btn:hover { border-color: #667eea; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102,126,234,0.25); }
+        .identity-btn .role-label { display: block; font-size: 12px; color: #999; margin-top: 4px; font-weight: 400; }
+        .identity-btn.admin-btn {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-color: transparent;
+        }
+
+        /* 提醒事项 */
+        .welcome-text {
+            text-align: center; margin-bottom: 18px; padding: 14px;
+            background: linear-gradient(135deg, #eef2ff, #fdf4ff); border-radius: 12px;
+        }
+        .welcome-text p { font-size: 15px; color: #555; line-height: 1.6; }
+        .welcome-text strong { color: #667eea; }
+        .task-list { list-style: none; }
+        .task-item {
+            border: 2px solid #eee; border-radius: 14px; padding: 18px 16px;
+            margin-bottom: 14px; transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .task-item:before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+            background: linear-gradient(180deg, #667eea, #764ba2); border-radius: 14px 0 0 14px;
+        }
+        .task-item.completed { background: linear-gradient(135deg, #f0fdf4, #ecfccb); border-color: #86efac; }
+        .task-item.completed:before { background: linear-gradient(180deg, #22c55e, #84cc16); }
+        .task-item.completed .task-title { color: #166534; }
+        .task-item.locked { opacity: 0.75; }
+        .task-item.locked:before { background: linear-gradient(180deg, #d1d5db, #9ca3af); }
+
+        .task-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .task-number {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; border-radius: 50%; font-weight: 700; font-size: 15px; flex-shrink: 0;
+        }
+        .task-item.completed .task-number { background: linear-gradient(135deg, #22c55e, #84cc16); }
+        .task-item.locked .task-number { background: linear-gradient(135deg, #9ca3af, #6b7280); }
+        .task-phase { font-size: 12px; color: #888; background: #f3f4f6; padding: 3px 10px; border-radius: 10px; margin-left: 12px; }
+        .task-item.completed .task-phase { background: #bbf7d0; color: #166534; }
+        .task-item.locked .task-phase { background: #f3f4f6; color: #9ca3af; }
+
+        .custom-checkbox { display: flex; align-items: center; cursor: pointer; user-select: none; margin-left: auto; }
+        .custom-checkbox.locked { cursor: not-allowed; opacity: 0.4; pointer-events: none; }
+        .custom-checkbox input { display: none; }
+        .checkmark {
+            width: 28px; height: 28px; border: 2.5px solid #ccc; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.25s ease; flex-shrink: 0;
+        }
+        .custom-checkbox.locked .checkmark { border-color: #d1d5db; background: #f9fafb; }
+        .custom-checkbox input:checked + .checkmark { background: linear-gradient(135deg, #22c55e, #84cc16); border-color: #22c55e; }
+        .checkmark:after {
+            content: '✓'; color: white; font-size: 16px; font-weight: bold;
+            opacity: 0; transform: scale(0); transition: all 0.2s ease;
+        }
+        .custom-checkbox input:checked + .checkmark:after { opacity: 1; transform: scale(1); }
+
+        .task-content { margin-top: 10px; }
+        .task-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 8px; line-height: 1.5; }
+        .task-desc { font-size: 14px; color: #666; line-height: 1.7; }
+        .task-time-hint { font-size: 12px; color: #f59e0b; margin-top: 6px; font-weight: 600; }
+
+        /* 锁定提示 */
+        .lock-hint {
+            display: flex; align-items: center; gap: 6px; margin-top: 10px; padding: 10px 14px;
+            background: #f3f4f6; border-radius: 10px; font-size: 13px; color: #6b7280; line-height: 1.6;
+        }
+        .lock-hint .lock-icon { font-size: 20px; flex-shrink: 0; }
+
+        /* 小程序按钮 */
+        .miniapp-btn {
+            display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+            padding: 10px 18px; background: linear-gradient(135deg, #07c160, #06ae56);
+            color: white; border: none; border-radius: 10px; font-size: 14px;
+            font-weight: 600; cursor: pointer; transition: all 0.25s ease; text-decoration: none;
+        }
+        .miniapp-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(7,193,96,0.35); }
+        .miniapp-btn:active { transform: scale(0.97); }
+        .miniapp-btn .btn-icon { font-size: 18px; }
+        .btn-hint { font-size: 11px; color: #999; margin-top: 6px; text-align: center; line-height: 1.6; }
+
+        /* 站岗位置图 */
+        .position-map { margin-top: 12px; border-radius: 10px; overflow: hidden; border: 2px solid #fde68a; background: #fffbeb; }
+        .position-map img { width: 100%; display: block; }
+        .position-table { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 13px; }
+        .position-table th, .position-table td { padding: 8px 10px; border: 1px solid #e5e7eb; text-align: center; }
+        .position-table th { background: linear-gradient(135deg, #667eea, #764ba2); color: white; font-weight: 600; }
+        .position-table tr:nth-child(even) { background: #f9fafb; }
+        .position-table .highlight-row { background: #fef3c7 !important; font-weight: 600; color: #92400e; }
+
+        /* 进度条 - 右侧悬浮 */
+        .progress-section {
+            position: fixed; right: 12px; top: 50%; transform: translateY(-50%);
+            z-index: 100; background: white; padding: 16px 14px;
+            border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+            width: 56px; text-align: center;
+        }
+        .progress-text { font-size: 12px; font-weight: 700; color: #555; margin-bottom: 10px; line-height: 1.5; }
+        .progress-bar-wrap { width: 28px; height: 140px; background: #e5e7eb; border-radius: 14px; overflow: hidden; margin: 0 auto; position: relative; }
+        .progress-fill {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(0deg, #22c55e, #84cc16); border-radius: 14px;
+            transition: height 0.5s ease; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 11px; font-weight: bold;
+        }
+
+        .completion-msg { text-align: center; padding: 20px; display: none; }
+        .completion-msg.show { display: block; animation: bounceIn 0.6s ease; }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; } 50% { transform: scale(1.05); }
+            70% { transform: scale(0.95); } 100% { transform: scale(1); opacity: 1; }
+        }
+        .completion-msg h3 { color: #22c55e; font-size: 20px; margin-bottom: 8px; }
+        .completion-msg p { color: #666; font-size: 14px; }
+
+        /* 引导弹窗 */
+        .guide-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 9998; justify-content: center; align-items: center;
+        }
+        .guide-overlay.show { display: flex; }
+        .guide-card {
+            background: white; border-radius: 16px; padding: 24px 20px;
+            width: 90%; max-width: 380px; text-align: center;
+        }
+        .guide-card h3 { font-size: 18px; margin-bottom: 12px; color: #333; }
+        .guide-card .guide-steps { text-align: left; margin: 16px 0; }
+        .guide-step {
+            display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;
+            font-size: 14px; color: #555; line-height: 1.6;
+        }
+        .guide-step-num {
+            flex-shrink: 0; width: 24px; height: 24px; background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; border-radius: 50%; text-align: center; line-height: 24px;
+            font-size: 13px; font-weight: 700;
+        }
+        .guide-link-box {
+            background: #f3f4f6; border: 1.5px dashed #07c160; border-radius: 10px;
+            padding: 12px; margin: 12px 0; font-size: 13px; color: #07c160;
+            word-break: break-all; user-select: all; -webkit-user-select: all;
+            cursor: pointer; line-height: 1.5;
+        }
+        .guide-link-box:active { background: #dcfce7; }
+        .guide-btn {
+            display: block; width: 100%; padding: 12px; margin-top: 12px;
+            background: linear-gradient(135deg, #07c160, #06ae56);
+            color: white; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+        }
+        .guide-btn:active { transform: scale(0.97); }
+        .guide-close {
+            display: inline-block; margin-top: 12px; font-size: 13px;
+            color: #999; cursor: pointer; text-decoration: underline;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(0,0,0,0.85); color: white;
+            padding: 16px 28px; border-radius: 12px;
+            font-size: 15px; font-weight: 600; text-align: center;
+            z-index: 9999; opacity: 0; pointer-events: none;
+            transition: all 0.3s ease; line-height: 1.8; max-width: 90vw;
+        }
+        .toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+        /* 管理后台 */
+        .admin-panel { display: none; }
+        .admin-panel.show { display: block; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .admin-header h2 { font-size: 18px; color: #333; }
+        .refresh-btn {
+            padding: 8px 16px; background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
+        }
+        .status-card { border: 2px solid #e5e7eb; border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+        .status-card.all-done { border-color: #86efac; background: #f0fdf4; }
+        .status-card.partial { border-color: #fcd34d; background: #fffbeb; }
+        .status-name { font-size: 16px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .status-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+        .badge-done { background: #dcfce7; color: #166534; }
+        .badge-partial { background: #fef3c7; color: #92400e; }
+        .badge-none { background: #f3f4f6; color: #6b7280; }
+        .status-tasks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .status-task { text-align: center; padding: 8px 4px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+        .status-task.done { background: #dcfce7; color: #166534; }
+        .status-task.pending { background: #f3f4f6; color: #9ca3af; }
+        .status-task-num { display: block; font-size: 17px; margin-bottom: 2px; }
+        .summary-bar {
+            text-align: center; padding: 16px; background: linear-gradient(135deg, #eef2ff, #fdf4ff);
+            border-radius: 12px; margin-top: 16px; font-size: 14px; color: #555; line-height: 1.8;
+        }
+        .back-btn {
+            display: inline-block; margin-top: 16px; padding: 10px 24px;
+            background: white; color: #667eea; border: 2px solid #667eea;
+            border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none;
+        }
+        .footer-note {
+            text-align: center; font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 20px; padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>🚦 三外志愿者交通劝导 v3</h1>
+        <p class="subtitle">2026年6月17日 下午17:00-17:50 · 志愿服务提醒</p>
+    </div>
+
+    <!-- 身份选择 -->
+    <div class="card" id="identitySection">
+        <div class="identity-section">
+            <h2>👋 请选择您的身份</h2>
+            <div class="identity-grid">
+                <button class="identity-btn" onclick="selectIdentity('王雨晴妈妈', 1)">👩 王雨晴妈妈<span class="role-label">1号站岗位</span></button>
+                <button class="identity-btn" onclick="selectIdentity('严嘉毓妈妈', 2)">👩 严嘉毓妈妈<span class="role-label">2号站岗位</span></button>
+                <button class="identity-btn" onclick="selectIdentity('易语汐妈妈', 3)">👩 易语汐妈妈<span class="role-label">3号站岗位</span></button>
+                <button class="identity-btn" onclick="selectIdentity('张宇轩妈妈', 4)">👩 张宇轩妈妈<span class="role-label">4号站岗位</span></button>
+                <button class="identity-btn admin-btn" onclick="selectIdentity('组长', 0)">👨‍💼 组长管理后台<span class="role-label">查看所有家长的确认状态</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 家长视图 -->
+    <div class="card" id="parentView" style="display:none;">
+        <div class="info-bar">
+            <span class="info-tag" id="currentName"></span>
+            <span style="font-size:13px;color:#888;" id="currentPosition"></span>
+        </div>
+
+        <div class="welcome-text">
+            <p>👋 <strong id="greetName"></strong>，您好！以下是本次交通劝导志愿服务的<strong>4项重要提醒</strong>，请逐一阅读并在<strong>对应时间段</strong>勾选确认 ✅</p>
+        </div>
+
+        <ul class="task-list">
+            <!-- ====== 任务1：报名 ====== -->
+            <li class="task-item" id="task1">
+                <div class="task-header">
+                    <div style="display:flex;align-items:center;">
+                        <span class="task-number">1</span>
+                        <span class="task-phase">📅 服务前一天完成</span>
+                    </div>
+                    <label class="custom-checkbox" id="check1">
+                        <input type="checkbox" onchange="toggleTask(1)">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">完成志愿服务报名</div>
+                    <div class="task-desc">
+                        📋 请在<strong>「志愿深圳」微信小程序</strong>中报名以下活动：<br>
+                        <strong>"深圳市龙华区第三外国语学校2026年6月15日至6月18日交通劝导志愿服务（仅限本校学生家长参加）"</strong>
+                    </div>
+                    <button class="miniapp-btn" onclick="showMiniAppGuide('报名')">
+                        <span class="btn-icon">📱</span> 点此复制链接，去微信打开小程序报名
+                    </button>
+                    <div class="btn-hint">💡 点击自动复制链接 → 粘贴到微信聊天框发送 → 点击链接打开小程序</div>
+                    <div class="task-time-hint">⚠️ 截止时间：6月16日 24:00 前</div>
+                    <div class="lock-hint" id="lock1">
+                        <span class="lock-icon">🔒</span>
+                        <span>打勾时间：<strong>即日起至6月17日 12:00</strong> 前可确认</span>
+                    </div>
+                </div>
+            </li>
+
+            <!-- ====== 任务2：站岗位置 ====== -->
+            <li class="task-item" id="task2">
+                <div class="task-header">
+                    <div style="display:flex;align-items:center;">
+                        <span class="task-number">2</span>
+                        <span class="task-phase">📍 服务前一天确认</span>
+                    </div>
+                    <label class="custom-checkbox" id="check2">
+                        <input type="checkbox" onchange="toggleTask(2)">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">确认您的站岗位置</div>
+                    <div class="task-desc">
+                        本次服务的站岗地点在<strong>学校3号门</strong>（长湖东路），请牢记您的站岗位置编号：
+                    </div>
+                    <table class="position-table" id="positionTable">
+                        <tr><th>位置号</th><th>负责家长</th></tr>
+                    </table>
+                    <div class="position-map">
+                        <img src="position-map.jpg" alt="三外志愿者值日位置指引图">
+                    </div>
+                    <div class="lock-hint" id="lock2">
+                        <span class="lock-icon">🔒</span>
+                        <span>打勾时间：<strong>即日起至6月17日 12:00</strong> 前可确认</span>
+                    </div>
+                </div>
+            </li>
+
+            <!-- ====== 任务3：签到 ====== -->
+            <li class="task-item" id="task3">
+                <div class="task-header">
+                    <div style="display:flex;align-items:center;">
+                        <span class="task-number">3</span>
+                        <span class="task-phase">📱 当天到岗签到</span>
+                    </div>
+                    <label class="custom-checkbox locked" id="check3">
+                        <input type="checkbox" onchange="toggleTask(3)" disabled>
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">志愿者小程序签到</div>
+                    <div class="task-desc">
+                        到达站岗位置后，请及时在<strong>「志愿深圳」微信小程序</strong>上点击<strong>【签到】</strong>。<br>
+                        🕐 建议签到时间：<strong>16:50 ~ 17:05</strong><br>
+                        💡 提示：签到是计算志愿服务时长的必要步骤，请勿忘记！
+                    </div>
+                    <button class="miniapp-btn" onclick="showMiniAppGuide('签到')">
+                        <span class="btn-icon">📱</span> 点此复制链接，去微信打开小程序签到
+                    </button>
+                    <div class="btn-hint">💡 点击自动复制链接 → 粘贴到微信聊天框发送 → 点击链接打开小程序</div>
+                    <div class="lock-hint" id="lock3">
+                        <span class="lock-icon">🔒</span>
+                        <span>打勾时间：<strong>6月17日 16:50</strong> 起开放确认</span>
+                    </div>
+                </div>
+            </li>
+
+            <!-- ====== 任务4：签退 ====== -->
+            <li class="task-item" id="task4">
+                <div class="task-header">
+                    <div style="display:flex;align-items:center;">
+                        <span class="task-number">4</span>
+                        <span class="task-phase">🔚 当天结束签退</span>
+                    </div>
+                    <label class="custom-checkbox locked" id="check4">
+                        <input type="checkbox" onchange="toggleTask(4)" disabled>
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">志愿者小程序签退</div>
+                    <div class="task-desc">
+                        服务时间结束后，请在<strong>「志愿深圳」微信小程序</strong>上点击<strong>【签退】</strong>。<br>
+                        🕐 建议签退时间：<strong>17:45 ~ 18:00</strong><br>
+                        💡 提示：只有完成签退后，本次志愿服务时长才会被系统正式记录。
+                    </div>
+                    <button class="miniapp-btn" onclick="showMiniAppGuide('签退')">
+                        <span class="btn-icon">📱</span> 点此复制链接，去微信打开小程序签退
+                    </button>
+                    <div class="btn-hint">💡 点击自动复制链接 → 粘贴到微信聊天框发送 → 点击链接打开小程序</div>
+                    <div class="lock-hint" id="lock4">
+                        <span class="lock-icon">🔒</span>
+                        <span>打勾时间：<strong>6月17日 17:45</strong> 起开放确认</span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        <div class="progress-section" id="progressBar">
+            <div class="progress-text"><span id="doneCount">0</span>/4</div>
+            <div class="progress-bar-wrap">
+                <div class="progress-fill" id="progressFill" style="height: 0%"></div>
+            </div>
+            <div class="progress-text" style="font-size:10px;color:#f59e0b;margin-top:8px;margin-bottom:0;">剩<span id="remainCount">4</span>项</div>
+        </div>
+
+        <div class="completion-msg" id="completionMsg">
+            <h3>🎉 太棒了！全部确认完成！</h3>
+            <p>感谢您对学校交通安全工作的支持与配合<br>我们6月17日下午见！👋</p>
+        </div>
+
+        <div style="text-align:center;margin-top:16px;">
+            <button class="back-btn" onclick="resetView()">← 返回重新选择身份</button>
+        </div>
+    </div>
+
+    <!-- 组长管理后台 -->
+    <div class="card admin-panel" id="adminPanel">
+        <div class="admin-header">
+            <h2>📊 各家长提醒确认情况一览</h2>
+            <button class="refresh-btn" onclick="loadAdminData()">🔄 刷新数据</button>
+        </div>
+        <div id="adminContent"></div>
+        <div style="text-align:center;margin-top:16px;">
+            <button class="back-btn" onclick="resetView()">← 返回</button>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        龙华区第三外国语学校 · 交通劝导志愿服务队 · 第1小组
+    </div>
+</div>
+
+<!-- 小程序跳转引导弹窗 -->
+<div class="guide-overlay" id="guideOverlay">
+    <div class="guide-card">
+        <h3>📱 打开志愿深圳小程序</h3>
+        <p style="font-size:14px;color:#666;margin-bottom:12px;">如未自动跳转，请<strong>长按下方链接</strong> → 复制 → 发到微信聊天框 → 点击打开</p>
+        <div class="guide-link-box" id="guideLinkBox" onclick="copyGuideLink()">
+            #小程序://志愿深圳/KrZkyQssEDQNWbf
+        </div>
+        <button class="guide-btn" id="guideCopyBtn" onclick="copyGuideLink()">📋 一键复制链接</button>
+        <span class="guide-close" onclick="closeGuide()">关闭</span>
+    </div>
+</div>
+
+<script>
+// ========== 数据模型 ==========
+const PARENTS = [
+    { key: 'wangyuqing', name: '王雨晴妈妈', pos: '1号位', posNum: 1 },
+    { key: 'yanjiayu', name: '严嘉毓妈妈', pos: '2号位', posNum: 2 },
+    { key: 'yiyuxi', name: '易语汐妈妈', pos: '3号位', posNum: 3 },
+    { key: 'zhangyuxuan', name: '张宇轩妈妈', pos: '4号位', posNum: 4 }
+];
+
+const STORAGE_PREFIX = 'volunteer_20260617_';
+const MINIAPP_LINK = '#小程序://志愿深圳/KrZkyQssEDQNWbf';
+
+// 解锁时间
+const TASK_UNLOCK = [
+    null,
+    new Date(2026, 5, 10, 0, 0, 0),   // 任务1：6月10日起
+    new Date(2026, 5, 10, 0, 0, 0),   // 任务2：6月10日起
+    new Date(2026, 5, 17, 16, 50, 0), // 任务3：6月17日 16:50
+    new Date(2026, 5, 17, 17, 45, 0)  // 任务4：6月17日 17:45
+];
+
+// 截止时间（仅任务1、2有）
+const TASK_DEADLINE = [
+    null,
+    new Date(2026, 5, 17, 12, 0, 0),  // 任务1截止：6月17日 12:00
+    new Date(2026, 5, 17, 12, 0, 0),  // 任务2截止：6月17日 12:00
+    null, null
+];
+
+const TASK_LABELS = ['', '报名', '站位', '签到', '签退'];
+let currentParent = null;
+let unlockTimer = null;
+
+// ========== 小程序跳转 ==========
+function showMiniAppGuide(actionName) {
+    var overlay = document.getElementById('guideOverlay');
+    if (overlay) {
+        overlay.classList.add('show');
+    }
+    copyGuideLinkSilent();
+}
+
+function closeGuide() {
+    var overlay = document.getElementById('guideOverlay');
+    if (overlay) {
+        overlay.classList.remove('show');
+    }
+}
+
+function copyGuideLink() {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(MINIAPP_LINK).then(function() {
+            document.getElementById('guideCopyBtn').textContent = '✅ 已复制链接！';
+            document.getElementById('guideCopyBtn').style.background = 'linear-gradient(135deg, #10b981, #34d399)';
+            setTimeout(function() {
+                document.getElementById('guideCopyBtn').textContent = '📋 一键复制链接';
+                document.getElementById('guideCopyBtn').style.background = 'linear-gradient(135deg, #07c160, #06ae56)';
+            }, 2000);
+        }).catch(fallbackCopyGuide);
+    } else {
+        fallbackCopyGuide();
+    }
+}
+
+function copyGuideLinkSilent() {
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(MINIAPP_LINK).catch(function(){});
+        }
+    } catch(e) {}
+}
+
+function fallbackCopyGuide() {
+    var ta = document.createElement('textarea');
+    ta.value = MINIAPP_LINK;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    document.getElementById('guideCopyBtn').textContent = '✅ 已复制！';
+    setTimeout(function() {
+        document.getElementById('guideCopyBtn').textContent = '📋 一键复制链接';
+    }, 2000);
+}
+
+// ========== 打勾时间控制 ==========
+function isTaskUnlocked(taskNum) {
+    var unlockTime = TASK_UNLOCK[taskNum];
+    if (!unlockTime) return true;
+    var now = new Date();
+    if (now < unlockTime) return false;
+    var deadline = TASK_DEADLINE[taskNum];
+    if (deadline && now >= deadline) return false;
+    return true;
+}
+
+function getLockReason(taskNum) {
+    var now = new Date();
+    var unlockTime = TASK_UNLOCK[taskNum];
+    if (unlockTime && now < unlockTime) {
+        var pad = function(n) { return String(n).padStart(2, '0'); };
+        return '需等到 <strong>' + (unlockTime.getMonth()+1) + '月' + unlockTime.getDate() + '日 ' + pad(unlockTime.getHours()) + ':' + pad(unlockTime.getMinutes()) + '</strong> 后才能确认打勾';
+    }
+    var deadline = TASK_DEADLINE[taskNum];
+    if (deadline && now >= deadline) {
+        var pad2 = function(n) { return String(n).padStart(2, '0'); };
+        return '已超过截止时间 <strong>' + (deadline.getMonth()+1) + '月' + deadline.getDate() + '日 ' + pad2(deadline.getHours()) + ':' + pad2(deadline.getMinutes()) + '</strong>，不可再打勾';
+    }
+    return '';
+}
+
+function updateTaskLockState(taskNum) {
+    var unlocked = isTaskUnlocked(taskNum);
+    var taskEl = document.getElementById('task' + taskNum);
+    var checkEl = document.getElementById('check' + taskNum);
+    var checkbox = checkEl.querySelector('input[type="checkbox"]');
+    var lockEl = document.getElementById('lock' + taskNum);
+
+    if (unlocked) {
+        taskEl.classList.remove('locked');
+        checkEl.classList.remove('locked');
+        checkbox.disabled = false;
+        if (lockEl) lockEl.style.display = 'none';
+    } else {
+        if (!taskEl.classList.contains('completed')) {
+            taskEl.classList.add('locked');
+            checkEl.classList.add('locked');
+            checkbox.disabled = true;
+        }
+        if (lockEl) lockEl.style.display = 'flex';
+    }
+}
+
+function updateAllTaskLocks() {
+    for (var i = 1; i <= 4; i++) updateTaskLockState(i);
+}
+
+function startUnlockTimer() {
+    if (unlockTimer) clearInterval(unlockTimer);
+    unlockTimer = setInterval(function() {
+        var anyChanged = false;
+        for (var i = 1; i <= 4; i++) {
+            var taskEl = document.getElementById('task' + i);
+            var wasLocked = taskEl.classList.contains('locked') && !taskEl.classList.contains('completed');
+            var nowUnlocked = isTaskUnlocked(i);
+            if (wasLocked && nowUnlocked) {
+                updateTaskLockState(i);
+                anyChanged = true;
+            }
+        }
+        if (anyChanged) showToast('🔓 新的提醒事项已解锁，可以打勾确认啦！', 3000);
+    }, 30000);
+}
+
+// ========== 身份选择 ==========
+function selectIdentity(name, index) {
+    if (index === 0) {
+        document.getElementById('identitySection').style.display = 'none';
+        document.getElementById('parentView').style.display = 'none';
+        document.getElementById('adminPanel').classList.add('show');
+        if (unlockTimer) { clearInterval(unlockTimer); unlockTimer = null; }
+        loadAdminData();
+    } else {
+        currentParent = PARENTS[index - 1];
+        document.getElementById('identitySection').style.display = 'none';
+        document.getElementById('parentView').style.display = 'block';
+        document.getElementById('adminPanel').classList.remove('show');
+        document.getElementById('currentName').textContent = currentParent.name;
+        document.getElementById('currentPosition').textContent = '📍 ' + currentParent.pos;
+        document.getElementById('greetName').textContent = currentParent.name;
+        buildPositionTable(index);
+        loadUserTasks();
+        startUnlockTimer();
+    }
+}
+
+function buildPositionTable(highlightIndex) {
+    var table = document.getElementById('positionTable');
+    var html = "<tr><th>位置号</th><th>负责家长</th></tr>";
+    for (var i = 0; i < PARENTS.length; i++) {
+        var p = PARENTS[i];
+        var isMe = p.posNum === highlightIndex;
+        html += '<tr class="' + (isMe ? 'highlight-row' : '') + '"><td>' + p.posNum + '号</td><td>' + (isMe ? '★ ' : '') + p.name + (isMe ? ' （您）' : '') + '</td></tr>';
+    }
+    table.innerHTML = html;
+}
+
+// ========== 任务操作 ==========
+function toggleTask(taskNum) {
+    if (!isTaskUnlocked(taskNum)) {
+        showToast('🔒 ' + getLockReason(taskNum), 3000);
+        var checkEl = document.getElementById('check' + taskNum);
+        checkEl.querySelector('input[type="checkbox"]').checked = false;
+        return;
+    }
+
+    var taskEl = document.getElementById('task' + taskNum);
+    var checkbox = taskEl.querySelector('input[type="checkbox"]');
+    var isDone = checkbox.checked;
+
+    if (isDone) {
+        taskEl.classList.add('completed');
+        taskEl.classList.remove('locked');
+        saveTask(currentParent.key, taskNum, true);
+    } else {
+        taskEl.classList.remove('completed');
+        saveTask(currentParent.key, taskNum, false);
+        updateTaskLockState(taskNum);
+    }
+
+    updateProgress();
+
+    if (isDone && currentParent) {
+        var timeKey = STORAGE_PREFIX + currentParent.key + '_time_' + taskNum;
+        if (!localStorage.getItem(timeKey)) {
+            localStorage.setItem(timeKey, new Date().toISOString());
+        }
+    }
+}
+
+function updateProgress() {
+    var doneCount = 0;
+    for (var i = 1; i <= 4; i++) {
+        if (document.getElementById('task' + i).classList.contains('completed')) doneCount++;
+    }
+    document.getElementById('doneCount').textContent = doneCount;
+    document.getElementById('remainCount').textContent = 4 - doneCount;
+    var pct = Math.round((doneCount / 4) * 100);
+    var fillEl = document.getElementById('progressFill');
+    fillEl.style.height = pct + '%';
+    fillEl.textContent = pct >= 25 ? pct + '%' : '';
+
+    var msg = document.getElementById('completionMsg');
+    if (doneCount === 4) {
+        msg.classList.add('show');
+        localStorage.setItem(STORAGE_PREFIX + currentParent.key + '_allDone', 'true');
+        localStorage.setItem(STORAGE_PREFIX + currentParent.key + '_allDoneTime', new Date().toISOString());
+    } else {
+        msg.classList.remove('show');
+        localStorage.removeItem(STORAGE_PREFIX + currentParent.key + '_allDone');
+    }
+}
+
+function loadUserTasks() {
+    for (var i = 1; i <= 4; i++) {
+        var saved = localStorage.getItem(STORAGE_PREFIX + currentParent.key + '_task' + i);
+        if (saved === 'true') {
+            var taskEl = document.getElementById('task' + i);
+            var checkEl = document.getElementById('check' + i);
+            checkEl.querySelector('input[type="checkbox"]').checked = true;
+            taskEl.classList.add('completed');
+            taskEl.classList.remove('locked');
+            checkEl.classList.remove('locked');
+            checkEl.querySelector('input[type="checkbox"]').disabled = false;
+            var lockEl = document.getElementById('lock' + i);
+            if (lockEl) lockEl.style.display = 'none';
+        } else {
+            updateTaskLockState(i);
+        }
+    }
+    updateProgress();
+}
+
+function saveTask(parentKey, taskNum, isDone) {
+    localStorage.setItem(STORAGE_PREFIX + parentKey + '_task' + taskNum, isDone ? 'true' : 'false');
+    localStorage.setItem(STORAGE_PREFIX + parentKey + '_name', PARENTS.find(function(p) { return p.key === parentKey; }).name);
+    localStorage.setItem(STORAGE_PREFIX + parentKey + '_lastUpdate', new Date().toISOString());
+}
+
+// ========== Toast ==========
+function showToast(msg, duration) {
+    var existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    var toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = msg;
+    document.body.appendChild(toast);
+    requestAnimationFrame(function() { toast.classList.add('show'); });
+    setTimeout(function() {
+        toast.classList.remove('show');
+        setTimeout(function() { toast.remove(); }, 300);
+    }, duration || 2500);
+}
+
+// ========== 管理后台 ==========
+function loadAdminData() {
+    var html = '';
+    for (var pi = 0; pi < PARENTS.length; pi++) {
+        var parent = PARENTS[pi];
+        var tasks = [], doneTotal = 0;
+        for (var i = 1; i <= 4; i++) {
+            var s = localStorage.getItem(STORAGE_PREFIX + parent.key + '_task' + i) === 'true';
+            tasks.push(s);
+            if (s) doneTotal++;
+        }
+        var allDone = doneTotal === 4;
+        var partial = doneTotal > 0 && doneTotal < 4;
+        var cardClass = allDone ? 'all-done' : (partial ? 'partial' : '');
+        var badgeClass = allDone ? 'badge-done' : (partial ? 'badge-partial' : 'badge-none');
+        var badgeText = allDone ? '✅ 全部确认' : (partial ? '🔄 ' + doneTotal + '/4' : '⏳ 待确认');
+        var lastUpdate = localStorage.getItem(STORAGE_PREFIX + parent.key + '_lastUpdate');
+        var allDoneTime = localStorage.getItem(STORAGE_PREFIX + parent.key + '_allDoneTime');
+        var timeInfo = '';
+        if (allDoneTime) {
+            timeInfo = '<div style="font-size:12px;color:#22c55e;margin-top:6px;">🕐 全部确认于 ' + formatDate(new Date(allDoneTime)) + '</div>';
+        } else if (lastUpdate) {
+            timeInfo = '<div style="font-size:12px;color:#888;margin-top:6px;">🕐 最近操作 ' + formatDate(new Date(lastUpdate)) + '</div>';
+        }
+        var tasksHtml = '';
+        for (var j = 0; j < 4; j++) {
+            tasksHtml += '<div class="status-task ' + (tasks[j] ? 'done' : 'pending') + '"><span class="status-task-num">' + (tasks[j] ? '✓' : (j+1)) + '</span>' + TASK_LABELS[j+1] + '</div>';
+        }
+        html += '<div class="status-card ' + cardClass + '"><div class="status-name">👩 ' + parent.name + '<span style="font-size:13px;font-weight:400;color:#888;">· ' + parent.pos + '</span><span class="status-badge ' + badgeClass + '">' + badgeText + '</span></div><div class="status-tasks">' + tasksHtml + '</div>' + timeInfo + '</div>';
+    }
+    var totalDone = 0, allDoneCount = 0;
+    for (var k = 0; k < PARENTS.length; k++) {
+        for (var m = 1; m <= 4; m++) {
+            if (localStorage.getItem(STORAGE_PREFIX + PARENTS[k].key + '_task' + m) === 'true') totalDone++;
+        }
+        if (localStorage.getItem(STORAGE_PREFIX + PARENTS[k].key + '_allDone') === 'true') allDoneCount++;
+    }
+    var maxTasks = PARENTS.length * 4;
+    html += '<div class="summary-bar"><strong>📈 总体统计</strong><br>共 ' + PARENTS.length + ' 位家长 · ' + maxTasks + ' 个提醒项<br>已确认：<strong style="color:#22c55e;font-size:18px;">' + totalDone + '/' + maxTasks + '</strong> (' + Math.round(totalDone/maxTasks*100) + '%)<br>全部完成家长：<strong style="color:#22c55e;">' + allDoneCount + '/' + PARENTS.length + '</strong> 人</div>';
+    document.getElementById('adminContent').innerHTML = html;
+}
+
+function formatDate(d) {
+    var pad = function(n) { return String(n).padStart(2, '0'); };
+    return (d.getMonth()+1) + '/' + d.getDate() + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+function resetView() {
+    if (unlockTimer) { clearInterval(unlockTimer); unlockTimer = null; }
+    document.getElementById('identitySection').style.display = 'block';
+    document.getElementById('parentView').style.display = 'none';
+    document.getElementById('adminPanel').classList.remove('show');
+    currentParent = null;
+}
+</script>
+</body>
+</html>
+
