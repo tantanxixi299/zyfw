@@ -468,11 +468,11 @@ let unlockTimer = null;
 
 // ========== 小程序跳转 ==========
 function showMiniAppGuide(actionName) {
-    // 微信内置浏览器中，#小程序:// 链接无法通过 JS 唤起
-    // 唯一可靠方式：复制链接 → 用户粘贴到微信聊天 → 点击打开
-    copyGuideLinkSilent();
+    // 先显示弹窗（不依赖复制是否成功）
     document.getElementById('guideAction').textContent = actionName;
     document.getElementById('guideOverlay').classList.add('show');
+    // 再尝试复制（异步，不影响弹窗显示）
+    copyGuideLinkSilent();
 }
 
 function closeGuide() {
@@ -495,9 +495,11 @@ function copyGuideLink() {
 }
 
 function copyGuideLinkSilent() {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(MINIAPP_LINK).catch(function(){});
-    }
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(MINIAPP_LINK).catch(function(){});
+        }
+    } catch(e) {}
 }
 
 function fallbackCopyGuide() {
