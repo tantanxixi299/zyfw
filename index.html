@@ -471,15 +471,18 @@ let unlockTimer = null;
 
 // ========== 小程序跳转 ==========
 function showMiniAppGuide(actionName) {
-    // 先显示弹窗（不依赖复制是否成功）
-    document.getElementById('guideAction').textContent = actionName;
-    document.getElementById('guideOverlay').classList.add('show');
-    // 再尝试复制（异步，不影响弹窗显示）
+    var overlay = document.getElementById('guideOverlay');
+    if (overlay) {
+        overlay.classList.add('show');
+    }
     copyGuideLinkSilent();
 }
 
 function closeGuide() {
-    document.getElementById('guideOverlay').classList.remove('show');
+    var overlay = document.getElementById('guideOverlay');
+    if (overlay) {
+        overlay.classList.remove('show');
+    }
 }
 
 function copyGuideLink() {
