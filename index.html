@@ -127,19 +127,20 @@
         .position-table tr:nth-child(even) { background: #f9fafb; }
         .position-table .highlight-row { background: #fef3c7 !important; font-weight: 600; color: #92400e; }
 
-        /* 进度条 */
+        /* 进度条 - 右侧悬浮 */
         .progress-section {
-            position: sticky; bottom: 0; z-index: 100;
-            background: white; padding: 14px 16px;
-            border-radius: 16px; margin-top: 16px;
-            box-shadow: 0 -2px 16px rgba(0,0,0,0.1);
+            position: fixed; right: 12px; top: 50%; transform: translateY(-50%);
+            z-index: 100; background: white; padding: 16px 14px;
+            border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+            width: 56px; text-align: center;
         }
-        .progress-text { font-size: 14px; font-weight: 700; color: #555; margin-bottom: 8px; text-align: center; }
-        .progress-bar-wrap { height: 22px; background: #e5e7eb; border-radius: 11px; overflow: hidden; }
+        .progress-text { font-size: 12px; font-weight: 700; color: #555; margin-bottom: 10px; line-height: 1.5; }
+        .progress-bar-wrap { width: 28px; height: 140px; background: #e5e7eb; border-radius: 14px; overflow: hidden; margin: 0 auto; position: relative; }
         .progress-fill {
-            height: 100%; background: linear-gradient(90deg, #22c55e, #84cc16); border-radius: 11px;
-            transition: width 0.5s ease; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 12px; font-weight: bold; min-width: 44px;
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(0deg, #22c55e, #84cc16); border-radius: 14px;
+            transition: height 0.5s ease; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 11px; font-weight: bold;
         }
 
         .completion-msg { text-align: center; padding: 20px; display: none; }
@@ -395,10 +396,11 @@
         </ul>
 
         <div class="progress-section" id="progressBar">
-            <div class="progress-text">✅ 已确认 <strong id="doneCount">0</strong> / 4 项提醒 ｜ 还剩 <strong id="remainCount">4</strong> 项</div>
+            <div class="progress-text"><span id="doneCount">0</span>/4</div>
             <div class="progress-bar-wrap">
-                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+                <div class="progress-fill" id="progressFill" style="height: 0%"></div>
             </div>
+            <div class="progress-text" style="font-size:10px;color:#f59e0b;margin-top:8px;margin-bottom:0;">剩<span id="remainCount">4</span>项</div>
         </div>
 
         <div class="completion-msg" id="completionMsg">
@@ -672,8 +674,8 @@ function updateProgress() {
     document.getElementById('remainCount').textContent = 4 - doneCount;
     var pct = Math.round((doneCount / 4) * 100);
     var fillEl = document.getElementById('progressFill');
-    fillEl.style.width = pct + '%';
-    fillEl.textContent = pct >= 20 ? pct + '%' : '';
+    fillEl.style.height = pct + '%';
+    fillEl.textContent = pct >= 25 ? pct + '%' : '';
 
     var msg = document.getElementById('completionMsg');
     if (doneCount === 4) {
