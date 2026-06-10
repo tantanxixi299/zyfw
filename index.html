@@ -284,9 +284,9 @@
                         <strong>"深圳市龙华区第三外国语学校2026年6月15日至6月18日交通劝导志愿服务（仅限本校学生家长参加）"</strong>
                     </div>
                     <button class="miniapp-btn" onclick="showMiniAppGuide('报名')">
-                        <span class="btn-icon">📱</span> 点击打开志愿深圳小程序报名
+                        <span class="btn-icon">📱</span> 点此复制链接，去微信打开小程序报名
                     </button>
-                    <div class="btn-hint">💡 点击按钮按指引操作，即可打开志愿深圳小程序</div>
+                    <div class="btn-hint">💡 点击自动复制链接 → 粘贴到微信聊天框发送 → 点击链接打开小程序</div>
                     <div class="task-time-hint">⚠️ 截止时间：6月16日 24:00 前</div>
                     <div class="lock-hint" id="lock1">
                         <span class="lock-icon">🔒</span>
@@ -345,9 +345,9 @@
                         💡 提示：签到是计算志愿服务时长的必要步骤，请勿忘记！
                     </div>
                     <button class="miniapp-btn" onclick="showMiniAppGuide('签到')">
-                        <span class="btn-icon">📱</span> 点击打开志愿深圳小程序签到
+                        <span class="btn-icon">📱</span> 点此复制链接，去微信打开小程序签到
                     </button>
-                    <div class="btn-hint">💡 点击按钮按指引操作，即可打开志愿深圳小程序</div>
+                    <div class="btn-hint">💡 点击自动复制链接 → 粘贴到微信聊天框发送 → 点击链接打开小程序</div>
                     <div class="lock-hint" id="lock3">
                         <span class="lock-icon">🔒</span>
                         <span>打勾时间：<strong>6月17日 16:50</strong> 起开放确认</span>
@@ -375,9 +375,9 @@
                         💡 提示：只有完成签退后，本次志愿服务时长才会被系统正式记录。
                     </div>
                     <button class="miniapp-btn" onclick="showMiniAppGuide('签退')">
-                        <span class="btn-icon">📱</span> 点击打开志愿深圳小程序签退
+                        <span class="btn-icon">📱</span> 点此复制链接，去微信打开小程序签退
                     </button>
-                    <div class="btn-hint">💡 点击按钮按指引操作，即可打开志愿深圳小程序</div>
+                    <div class="btn-hint">💡 点击自动复制链接 → 粘贴到微信聊天框发送 → 点击链接打开小程序</div>
                     <div class="lock-hint" id="lock4">
                         <span class="lock-icon">🔒</span>
                         <span>打勾时间：<strong>6月17日 17:45</strong> 起开放确认</span>
@@ -466,23 +466,11 @@ const TASK_LABELS = ['', '报名', '站位', '签到', '签退'];
 let currentParent = null;
 let unlockTimer = null;
 
-// ========== 小程序跳转（点击按钮） ==========
+// ========== 小程序跳转 ==========
 function showMiniAppGuide(actionName) {
-    // 第一步：直接尝试跳转
-    // 在微信内置浏览器中，#小程序:// 链接在某些版本可以通过 location.href 唤起
-    // 先用 weixin:// 协议尝试（部分版本支持）
-    var ua = navigator.userAgent.toLowerCase();
-    var isWechat = ua.indexOf('micromessenger') !== -1;
-
-    if (isWechat) {
-        // 微信环境：直接尝试跳转小程序链接
-        location.href = MINIAPP_LINK;
-    }
-
-    // 第二步：自动复制链接到剪贴板
+    // 微信内置浏览器中，#小程序:// 链接无法通过 JS 唤起
+    // 唯一可靠方式：复制链接 → 用户粘贴到微信聊天 → 点击打开
     copyGuideLinkSilent();
-
-    // 第三步：显示极简引导弹窗
     document.getElementById('guideAction').textContent = actionName;
     document.getElementById('guideOverlay').classList.add('show');
 }
