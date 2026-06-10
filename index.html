@@ -424,22 +424,9 @@
 <div class="guide-overlay" id="guideOverlay">
     <div class="guide-card">
         <h3>📱 打开志愿深圳小程序</h3>
-        <div class="guide-steps">
-            <div class="guide-step">
-                <span class="guide-step-num">1</span>
-                <span>长按下方链接，点击<b>「复制」</b></span>
-            </div>
-            <div class="guide-link-box" id="guideLinkBox" onclick="copyGuideLink()">
-                #小程序://志愿深圳/KrZkyQssEDQNWbf
-            </div>
-            <div class="guide-step">
-                <span class="guide-step-num">2</span>
-                <span>回到微信，粘贴链接到<b>任意聊天框</b>（如"文件传输助手"）并发送</span>
-            </div>
-            <div class="guide-step">
-                <span class="guide-step-num">3</span>
-                <span>点击聊天框中发送的<b>蓝色链接</b>，即可打开志愿深圳小程序完成<span id="guideAction">操作</span></span>
-            </div>
+        <p style="font-size:14px;color:#666;margin-bottom:12px;">如未自动跳转，请<strong>长按下方链接</strong> → 复制 → 发到微信聊天框 → 点击打开</p>
+        <div class="guide-link-box" id="guideLinkBox" onclick="copyGuideLink()">
+            #小程序://志愿深圳/KrZkyQssEDQNWbf
         </div>
         <button class="guide-btn" id="guideCopyBtn" onclick="copyGuideLink()">📋 一键复制链接</button>
         <span class="guide-close" onclick="closeGuide()">关闭</span>
@@ -479,12 +466,25 @@ const TASK_LABELS = ['', '报名', '站位', '签到', '签退'];
 let currentParent = null;
 let unlockTimer = null;
 
-// ========== 小程序引导弹窗 ==========
+// ========== 小程序跳转（点击按钮） ==========
 function showMiniAppGuide(actionName) {
+    // 第一步：直接尝试跳转
+    // 在微信内置浏览器中，#小程序:// 链接在某些版本可以通过 location.href 唤起
+    // 先用 weixin:// 协议尝试（部分版本支持）
+    var ua = navigator.userAgent.toLowerCase();
+    var isWechat = ua.indexOf('micromessenger') !== -1;
+
+    if (isWechat) {
+        // 微信环境：直接尝试跳转小程序链接
+        location.href = MINIAPP_LINK;
+    }
+
+    // 第二步：自动复制链接到剪贴板
+    copyGuideLinkSilent();
+
+    // 第三步：显示极简引导弹窗
     document.getElementById('guideAction').textContent = actionName;
     document.getElementById('guideOverlay').classList.add('show');
-    // 同时尝试复制
-    copyGuideLinkSilent();
 }
 
 function closeGuide() {
