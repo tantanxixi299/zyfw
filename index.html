@@ -128,13 +128,18 @@
         .position-table .highlight-row { background: #fef3c7 !important; font-weight: 600; color: #92400e; }
 
         /* 进度条 */
-        .progress-section { margin-top: 20px; text-align: center; }
-        .progress-text { font-size: 15px; font-weight: 600; color: #555; margin-bottom: 10px; }
-        .progress-bar-wrap { height: 24px; background: #e5e7eb; border-radius: 12px; overflow: hidden; }
+        .progress-section {
+            position: sticky; bottom: 0; z-index: 100;
+            background: white; padding: 14px 16px;
+            border-radius: 16px; margin-top: 16px;
+            box-shadow: 0 -2px 16px rgba(0,0,0,0.1);
+        }
+        .progress-text { font-size: 14px; font-weight: 700; color: #555; margin-bottom: 8px; text-align: center; }
+        .progress-bar-wrap { height: 22px; background: #e5e7eb; border-radius: 11px; overflow: hidden; }
         .progress-fill {
-            height: 100%; background: linear-gradient(90deg, #22c55e, #84cc16); border-radius: 12px;
+            height: 100%; background: linear-gradient(90deg, #22c55e, #84cc16); border-radius: 11px;
             transition: width 0.5s ease; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 12px; font-weight: bold; min-width: 40px;
+            color: white; font-size: 12px; font-weight: bold; min-width: 44px;
         }
 
         .completion-msg { text-align: center; padding: 20px; display: none; }
@@ -389,8 +394,8 @@
             </li>
         </ul>
 
-        <div class="progress-section">
-            <div class="progress-text">已确认 <strong id="doneCount">0</strong> / 4 项提醒</div>
+        <div class="progress-section" id="progressBar">
+            <div class="progress-text">✅ 已确认 <strong id="doneCount">0</strong> / 4 项提醒 ｜ 还剩 <strong id="remainCount">4</strong> 项</div>
             <div class="progress-bar-wrap">
                 <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
             </div>
@@ -664,6 +669,7 @@ function updateProgress() {
         if (document.getElementById('task' + i).classList.contains('completed')) doneCount++;
     }
     document.getElementById('doneCount').textContent = doneCount;
+    document.getElementById('remainCount').textContent = 4 - doneCount;
     var pct = Math.round((doneCount / 4) * 100);
     var fillEl = document.getElementById('progressFill');
     fillEl.style.width = pct + '%';
