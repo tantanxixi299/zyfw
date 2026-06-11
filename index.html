@@ -510,6 +510,9 @@ var musicBtn = document.getElementById('musicBtn');
 var bgMusic = document.getElementById('bgMusic');
 var musicTip = document.getElementById('musicTip');
 
+// 微信浏览器需要先load才能play
+bgMusic.load();
+
 // 显示提示
 setTimeout(function() {
     if (musicTip && !musicPlaying) {
@@ -525,13 +528,27 @@ function toggleMusic() {
         musicBtn.classList.remove('playing');
         musicBtn.textContent = '🎵';
     } else {
-        bgMusic.play().then(function() {
-            musicPlaying = true;
-            musicBtn.classList.add('playing');
-            musicBtn.textContent = '🎶';
-        }).catch(function(e) {
-            showToast('⚠️ 播放失败，请点击重试', 2000);
-        });
+        // 确保从头开始或继续播放
+        bgMusic.load();
+        var playPromise = bgMusic.play();
+        if (playPromise !== undefined) {
+            playPromise.then(function() {
+                musicPlaying = true;
+                musicBtn.classList.add('playing');
+                musicBtn.textContent = '🎶';
+            }).catch(function(e) {
+                // 微信浏览器可能需要再试一次
+                setTimeout(function() {
+                    bgMusic.play().then(function() {
+                        musicPlaying = true;
+                        musicBtn.classList.add('playing');
+                        musicBtn.textContent = '🎶';
+                    }).catch(function() {
+                        showToast('⚠️ 请再点一次播放按钮', 2000);
+                    });
+                }, 300);
+            });
+        }
     }
     if (musicTip) musicTip.classList.remove('show');
 }
