@@ -416,6 +416,10 @@
                     <div class="position-map">
                         <img src="position-map.jpg" alt="三外志愿者值日位置指引图">
                     </div>
+                    <div class="position-map" id="stationPhoto" style="margin-top:12px;border-color:#bfdbfe;background:#eff6ff;text-align:center;display:none;">
+                        <img id="stationImg" alt="您的站岗位置实景照" style="max-width:80%;height:auto;display:inline-block;border-radius:8px;">
+                        <div style="font-size:12px;color:#3b82f6;margin-top:6px;">📍 以上是您<strong id="stationLabel"></strong>的站岗位置实景</div>
+                    </div>
                     <div class="lock-hint" id="lock2">
                         <span class="lock-icon">🔒</span>
                         <span>打勾时间：<strong>即日起至6月17日 12:00</strong> 前可确认</span>
@@ -791,6 +795,7 @@ function selectIdentity(name, index) {
         document.getElementById('currentPosition').textContent = '📍 ' + currentParent.pos;
         document.getElementById('greetName').textContent = currentParent.name;
         buildPositionTable(index);
+        loadStationPhoto(currentParent.posNum);
         loadUserTasks();
         startUnlockTimer();
     }
@@ -805,6 +810,17 @@ function buildPositionTable(highlightIndex) {
         html += '<tr class="' + (isMe ? 'highlight-row' : '') + '"><td>' + p.posNum + '号</td><td>' + (isMe ? '★ ' : '') + p.name + (isMe ? ' （您）' : '') + '</td></tr>';
     }
     table.innerHTML = html;
+}
+
+function loadStationPhoto(posNum) {
+    var container = document.getElementById('stationPhoto');
+    var img = document.getElementById('stationImg');
+    var label = document.getElementById('stationLabel');
+    if (!container || !img) return;
+    img.src = 'station' + posNum + '.jpg';
+    img.alt = posNum + '号站岗位置实景照';
+    if (label) label.textContent = posNum + '号位';
+    container.style.display = 'block';
 }
 
 // ========== 任务操作 ==========
