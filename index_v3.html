@@ -191,6 +191,43 @@
             color: #999; cursor: pointer; text-decoration: underline;
         }
 
+        /* 密码弹窗 */
+        .pwd-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 9998; justify-content: center; align-items: center;
+        }
+        .pwd-overlay.show { display: flex; }
+        .pwd-card {
+            background: white; border-radius: 16px; padding: 28px 24px;
+            width: 90%; max-width: 340px; text-align: center;
+        }
+        .pwd-card h3 { font-size: 18px; margin-bottom: 6px; color: #333; }
+        .pwd-card .pwd-subtitle { font-size: 13px; color: #888; margin-bottom: 18px; }
+        .pwd-input {
+            width: 100%; padding: 14px 16px; border: 2px solid #e5e7eb;
+            border-radius: 10px; font-size: 18px; text-align: center;
+            letter-spacing: 6px; outline: none; transition: border-color 0.2s;
+            -webkit-text-security: disc;
+        }
+        .pwd-input:focus { border-color: #667eea; }
+        .pwd-input.error { border-color: #ef4444; animation: shake 0.4s ease; }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .pwd-btn {
+            display: block; width: 100%; padding: 12px; margin-top: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+        }
+        .pwd-btn:active { transform: scale(0.97); }
+        .pwd-cancel {
+            display: inline-block; margin-top: 12px; font-size: 13px;
+            color: #999; cursor: pointer; text-decoration: underline;
+        }
+
         /* Toast */
         .toast {
             position: fixed; top: 50%; left: 50%;
@@ -474,6 +511,17 @@
     </div>
 </div>
 
+<!-- 管理后台密码验证弹窗 -->
+<div class="pwd-overlay" id="pwdOverlay">
+    <div class="pwd-card">
+        <h3>🔐 组长验证</h3>
+        <p class="pwd-subtitle">请输入管理密码以进入后台</p>
+        <input type="password" class="pwd-input" id="pwdInput" maxlength="6" placeholder="****" onkeydown="if(event.key==='Enter')verifyPwd()">
+        <button class="pwd-btn" onclick="verifyPwd()">确认进入</button>
+        <span class="pwd-cancel" onclick="closePwd()">取消</span>
+    </div>
+</div>
+
 <script>
 // ========== 数据模型 ==========
 const PARENTS = [
@@ -508,6 +556,38 @@ const TASK_DEADLINE = [
 const TASK_LABELS = ['', '报名', '站位', '服装', '签到', '签退'];
 let currentParent = null;
 let unlockTimer = null;
+
+// ========== 管理后台密码验证 ==========
+const ADMIN_PASSWORD = '0617'; // 服务日期：6月17日
+
+function verifyPwd() {
+    var input = document.getElementById('pwdInput');
+    if (input.value === ADMIN_PASSWORD) {
+        document.getElementById('pwdOverlay').classList.remove('show');
+        input.value = '';
+        input.classList.remove('error');
+        document.getElementById('identitySection').style.display = 'none';
+        document.getElementById('parentView').style.display = 'none';
+        document.getElementById('adminPanel').classList.add('show');
+        if (unlockTimer) { clearInterval(unlockTimer); unlockTimer = null; }
+        loadAdminData();
+    } else {
+        input.classList.add('error');
+        input.value = '';
+        input.placeholder = '密码错误，请重试';
+        setTimeout(function() {
+            input.classList.remove('error');
+            input.placeholder = '****';
+            input.focus();
+        }, 500);
+    }
+}
+
+function closePwd() {
+    document.getElementById('pwdOverlay').classList.remove('show');
+    document.getElementById('pwdInput').value = '';
+    document.getElementById('pwdInput').classList.remove('error');
+}
 
 // ========== 小程序跳转 ==========
 function showMiniAppGuide(actionName) {
@@ -635,11 +715,9 @@ function startUnlockTimer() {
 // ========== 身份选择 ==========
 function selectIdentity(name, index) {
     if (index === 0) {
-        document.getElementById('identitySection').style.display = 'none';
-        document.getElementById('parentView').style.display = 'none';
-        document.getElementById('adminPanel').classList.add('show');
-        if (unlockTimer) { clearInterval(unlockTimer); unlockTimer = null; }
-        loadAdminData();
+        // 弹出密码验证弹窗
+        document.getElementById('pwdOverlay').classList.add('show');
+        setTimeout(function() { document.getElementById('pwdInput').focus(); }, 300);
     } else {
         currentParent = PARENTS[index - 1];
         document.getElementById('identitySection').style.display = 'none';
