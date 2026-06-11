@@ -192,9 +192,16 @@
             position: fixed; z-index: 9992; pointer-events: none;
             animation: confettiFall linear forwards;
         }
+        .confetti.blast {
+            animation: confettiBlast linear forwards;
+        }
         @keyframes confettiFall {
             0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
             100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+        }
+        @keyframes confettiBlast {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.3); opacity: 0; }
         }
 
         /* 引导弹窗 */
@@ -525,11 +532,10 @@
         <!-- 全屏庆祝效果 -->
         <div class="celebrate-overlay" id="celebrateOverlay">
             <div class="celebrate-card">
-                <span class="trophy">🏆</span>
+                <span class="trophy">💐</span>
                 <h2>全部确认完成！</h2>
                 <div class="celeb-stars">⭐⭐⭐⭐⭐</div>
                 <p class="celeb-subtitle">感谢您对学校交通安全工作的<br>支持与配合！</p>
-                <p style="font-size:13px;color:#f59e0b;font-weight:600;">我们6月17日下午见！👋</p>
                 <button class="celeb-btn" onclick="closeCelebrate()" style="margin-top:14px;">👍 收到</button>
             </div>
         </div>
@@ -949,29 +955,59 @@ function formatDate(d) {
 
 // ========== 全屏庆祝效果 ==========
 function showCelebrate() {
-    // 撒花
     var colors = ['#ef4444','#f59e0b','#22c55e','#3b82f6','#8b5cf6','#ec4899','#f97316','#06b6d4'];
-    var shapes = ['●','■','▲','★','♦','❤','🌸','🎉'];
+    var shapes = ['●','■','▲','★','♦','❤','🌸','🎉','🎊','✨','💫'];
     var container = document.body;
-    for (var i = 0; i < 60; i++) {
+
+    // 顶部撒花 — 增多到100个
+    for (var i = 0; i < 100; i++) {
         setTimeout(function() {
             var el = document.createElement('div');
             el.className = 'confetti';
             el.style.left = Math.random() * 100 + '%';
-            el.style.top = -(Math.random() * 60 + 20) + 'px';
-            el.style.fontSize = (Math.random() * 16 + 12) + 'px';
+            el.style.top = -(Math.random() * 80 + 20) + 'px';
+            el.style.fontSize = (Math.random() * 18 + 10) + 'px';
             el.style.color = colors[Math.floor(Math.random() * colors.length)];
-            el.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
-            el.style.animationDelay = '0s';
+            el.style.animationDuration = (Math.random() * 2.5 + 2) + 's';
             el.textContent = shapes[Math.floor(Math.random() * shapes.length)];
             container.appendChild(el);
-            setTimeout(function() { el.remove(); }, 3500);
-        }, i * 40);
+            setTimeout(function() { el.remove(); }, 4500);
+        }, i * 25);
     }
+
+    // 左下角喷射
+    spawnBlast('left', colors, shapes, container);
+    // 右下角喷射
+    spawnBlast('right', colors, shapes, container);
+
     // 弹出庆祝卡片
     setTimeout(function() {
         document.getElementById('celebrateOverlay').classList.add('show');
     }, 600);
+}
+
+function spawnBlast(side, colors, shapes, container) {
+    for (var i = 0; i < 40; i++) {
+        setTimeout(function() {
+            var el = document.createElement('div');
+            el.className = 'confetti blast';
+            el.style.left = (side === 'left' ? '0' : '100%');
+            el.style.bottom = '0';
+            el.style.fontSize = (Math.random() * 16 + 12) + 'px';
+            el.style.color = colors[Math.floor(Math.random() * colors.length)];
+            el.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+            el.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+            // 喷向对侧上方
+            var dx = (side === 'left' ? 1 : -1) * (Math.random() * 60 + 20);
+            var dy = -(Math.random() * 70 + 30);
+            var rot = (side === 'left' ? 1 : -1) * (Math.random() * 600 + 200);
+            el.style.setProperty('--dx', dx + 'vw');
+            el.style.setProperty('--dy', dy + 'vh');
+            el.style.setProperty('--rot', rot + 'deg');
+            container.appendChild(el);
+            setTimeout(function() { el.remove(); }, 3000);
+        }, i * 30);
+    }
 }
 
 function closeCelebrate() {
