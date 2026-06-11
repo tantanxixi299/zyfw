@@ -220,7 +220,7 @@
         .badge-done { background: #dcfce7; color: #166534; }
         .badge-partial { background: #fef3c7; color: #92400e; }
         .badge-none { background: #f3f4f6; color: #6b7280; }
-        .status-tasks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .status-tasks { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
         .status-task { text-align: center; padding: 8px 4px; border-radius: 8px; font-size: 12px; font-weight: 600; }
         .status-task.done { background: #dcfce7; color: #166534; }
         .status-task.pending { background: #f3f4f6; color: #9ca3af; }
@@ -269,7 +269,7 @@
         </div>
 
         <div class="welcome-text">
-            <p>👋 <strong id="greetName"></strong>，您好！以下是本次交通劝导志愿服务的<strong>4项重要提醒</strong>，请逐一阅读并在<strong>对应时间段</strong>勾选确认 ✅</p>
+            <p>👋 <strong id="greetName"></strong>，您好！以下是本次交通劝导志愿服务的<strong>5项重要提醒</strong>，请逐一阅读并在<strong>对应时间段</strong>勾选确认 ✅</p>
         </div>
 
         <ul class="task-list">
@@ -333,15 +333,42 @@
                 </div>
             </li>
 
-            <!-- ====== 任务3：签到 ====== -->
+            <!-- ====== 任务3：服装要求 ====== -->
             <li class="task-item" id="task3">
                 <div class="task-header">
                     <div style="display:flex;align-items:center;">
                         <span class="task-number">3</span>
+                        <span class="task-phase">👕 服务前一天准备</span>
+                    </div>
+                    <label class="custom-checkbox" id="check3">
+                        <input type="checkbox" onchange="toggleTask(3)">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div class="task-content">
+                    <div class="task-title">确认志愿者服装及用具</div>
+                    <div class="task-desc">
+                        👕 志愿者服装要求：<strong>穿红马甲、戴红帽、手执红色指引旗</strong><br>
+                        📍 以上服装及用具均需在<strong>学校义工房</strong>领取<br>
+                        📝 领取时请同时在<strong>义工房会议桌上完成纸质签到</strong><br>
+                        💡 提示：请务必在服务前领取好服装及用具，确保当天着装规范上岗。
+                    </div>
+                    <div class="lock-hint" id="lock3">
+                        <span class="lock-icon">🔒</span>
+                        <span>打勾时间：<strong>即日起至6月17日 12:00</strong> 前可确认</span>
+                    </div>
+                </div>
+            </li>
+
+            <!-- ====== 任务4：签到 ====== -->
+            <li class="task-item" id="task4">
+                <div class="task-header">
+                    <div style="display:flex;align-items:center;">
+                        <span class="task-number">4</span>
                         <span class="task-phase">📱 当天到岗签到</span>
                     </div>
-                    <label class="custom-checkbox locked" id="check3">
-                        <input type="checkbox" onchange="toggleTask(3)" disabled>
+                    <label class="custom-checkbox locked" id="check4">
+                        <input type="checkbox" onchange="toggleTask(4)" disabled>
                         <span class="checkmark"></span>
                     </label>
                 </div>
@@ -357,22 +384,22 @@
                         <span class="btn-icon">📱</span> 点此复制链接，去微信打开小程序签到
                     </button>
                     <div class="btn-hint">💡 点击自动复制链接 → 粘贴到微信聊天框发送 → 点击链接打开小程序</div>
-                    <div class="lock-hint" id="lock3">
+                    <div class="lock-hint" id="lock4">
                         <span class="lock-icon">🔒</span>
                         <span>打勾时间：<strong>6月17日 16:50</strong> 起开放确认</span>
                     </div>
                 </div>
             </li>
 
-            <!-- ====== 任务4：签退 ====== -->
-            <li class="task-item" id="task4">
+            <!-- ====== 任务5：签退 ====== -->
+            <li class="task-item" id="task5">
                 <div class="task-header">
                     <div style="display:flex;align-items:center;">
-                        <span class="task-number">4</span>
+                        <span class="task-number">5</span>
                         <span class="task-phase">🔚 当天结束签退</span>
                     </div>
-                    <label class="custom-checkbox locked" id="check4">
-                        <input type="checkbox" onchange="toggleTask(4)" disabled>
+                    <label class="custom-checkbox locked" id="check5">
+                        <input type="checkbox" onchange="toggleTask(5)" disabled>
                         <span class="checkmark"></span>
                     </label>
                 </div>
@@ -388,7 +415,7 @@
                         <span class="btn-icon">📱</span> 点此复制链接，去微信打开小程序签退
                     </button>
                     <div class="btn-hint">💡 点击自动复制链接 → 粘贴到微信聊天框发送 → 点击链接打开小程序</div>
-                    <div class="lock-hint" id="lock4">
+                    <div class="lock-hint" id="lock5">
                         <span class="lock-icon">🔒</span>
                         <span>打勾时间：<strong>17:00</strong> 起开放确认</span>
                     </div>
@@ -397,11 +424,11 @@
         </ul>
 
         <div class="progress-section" id="progressBar">
-            <div class="progress-text"><span id="doneCount">0</span>/4</div>
+            <div class="progress-text"><span id="doneCount">0</span>/5</div>
             <div class="progress-bar-wrap">
                 <div class="progress-fill" id="progressFill" style="height: 0%"></div>
             </div>
-            <div class="progress-text" style="font-size:10px;color:#f59e0b;margin-top:8px;margin-bottom:0;">剩<span id="remainCount">4</span>项</div>
+            <div class="progress-text" style="font-size:10px;color:#f59e0b;margin-top:8px;margin-bottom:0;">剩<span id="remainCount">5</span>项</div>
         </div>
 
         <div class="completion-msg" id="completionMsg">
@@ -461,19 +488,21 @@ const TASK_UNLOCK = [
     null,
     new Date(2026, 5, 10, 0, 0, 0),   // 任务1：6月10日起
     new Date(2026, 5, 10, 0, 0, 0),   // 任务2：6月10日起
-    new Date(2026, 5, 17, 16, 50, 0), // 任务3：6月17日 16:50
-    new Date(2026, 5, 17, 17, 0, 0)  // 任务4：6月17日 17:00
+    new Date(2026, 5, 10, 0, 0, 0),   // 任务3：6月10日起
+    new Date(2026, 5, 17, 16, 50, 0), // 任务4：6月17日 16:50
+    new Date(2026, 5, 17, 17, 0, 0)  // 任务5：6月17日 17:00
 ];
 
-// 截止时间（仅任务1、2有）
+// 截止时间（仅任务1、2、3有）
 const TASK_DEADLINE = [
     null,
     new Date(2026, 5, 17, 12, 0, 0),  // 任务1截止：6月17日 12:00
     new Date(2026, 5, 17, 12, 0, 0),  // 任务2截止：6月17日 12:00
+    new Date(2026, 5, 17, 12, 0, 0),  // 任务3截止：6月17日 12:00
     null, null
 ];
 
-const TASK_LABELS = ['', '报名', '站位', '签到', '签退'];
+const TASK_LABELS = ['', '报名', '站位', '服装', '签到', '签退'];
 let currentParent = null;
 let unlockTimer = null;
 
@@ -580,14 +609,14 @@ function updateTaskLockState(taskNum) {
 }
 
 function updateAllTaskLocks() {
-    for (var i = 1; i <= 4; i++) updateTaskLockState(i);
+    for (var i = 1; i <= 5; i++) updateTaskLockState(i);
 }
 
 function startUnlockTimer() {
     if (unlockTimer) clearInterval(unlockTimer);
     unlockTimer = setInterval(function() {
         var anyChanged = false;
-        for (var i = 1; i <= 4; i++) {
+        for (var i = 1; i <= 5; i++) {
             var taskEl = document.getElementById('task' + i);
             var wasLocked = taskEl.classList.contains('locked') && !taskEl.classList.contains('completed');
             var nowUnlocked = isTaskUnlocked(i);
@@ -668,18 +697,18 @@ function toggleTask(taskNum) {
 
 function updateProgress() {
     var doneCount = 0;
-    for (var i = 1; i <= 4; i++) {
+    for (var i = 1; i <= 5; i++) {
         if (document.getElementById('task' + i).classList.contains('completed')) doneCount++;
     }
     document.getElementById('doneCount').textContent = doneCount;
-    document.getElementById('remainCount').textContent = 4 - doneCount;
-    var pct = Math.round((doneCount / 4) * 100);
+    document.getElementById('remainCount').textContent = 5 - doneCount;
+    var pct = Math.round((doneCount / 5) * 100);
     var fillEl = document.getElementById('progressFill');
     fillEl.style.height = pct + '%';
-    fillEl.textContent = pct >= 25 ? pct + '%' : '';
+    fillEl.textContent = pct >= 20 ? pct + '%' : '';
 
     var msg = document.getElementById('completionMsg');
-    if (doneCount === 4) {
+    if (doneCount === 5) {
         msg.classList.add('show');
         localStorage.setItem(STORAGE_PREFIX + currentParent.key + '_allDone', 'true');
         localStorage.setItem(STORAGE_PREFIX + currentParent.key + '_allDoneTime', new Date().toISOString());
@@ -690,7 +719,7 @@ function updateProgress() {
 }
 
 function loadUserTasks() {
-    for (var i = 1; i <= 4; i++) {
+    for (var i = 1; i <= 5; i++) {
         var saved = localStorage.getItem(STORAGE_PREFIX + currentParent.key + '_task' + i);
         if (saved === 'true') {
             var taskEl = document.getElementById('task' + i);
@@ -736,16 +765,16 @@ function loadAdminData() {
     for (var pi = 0; pi < PARENTS.length; pi++) {
         var parent = PARENTS[pi];
         var tasks = [], doneTotal = 0;
-        for (var i = 1; i <= 4; i++) {
+        for (var i = 1; i <= 5; i++) {
             var s = localStorage.getItem(STORAGE_PREFIX + parent.key + '_task' + i) === 'true';
             tasks.push(s);
             if (s) doneTotal++;
         }
-        var allDone = doneTotal === 4;
-        var partial = doneTotal > 0 && doneTotal < 4;
+        var allDone = doneTotal === 5;
+        var partial = doneTotal > 0 && doneTotal < 5;
         var cardClass = allDone ? 'all-done' : (partial ? 'partial' : '');
         var badgeClass = allDone ? 'badge-done' : (partial ? 'badge-partial' : 'badge-none');
-        var badgeText = allDone ? '✅ 全部确认' : (partial ? '🔄 ' + doneTotal + '/4' : '⏳ 待确认');
+        var badgeText = allDone ? '✅ 全部确认' : (partial ? '🔄 ' + doneTotal + '/5' : '⏳ 待确认');
         var lastUpdate = localStorage.getItem(STORAGE_PREFIX + parent.key + '_lastUpdate');
         var allDoneTime = localStorage.getItem(STORAGE_PREFIX + parent.key + '_allDoneTime');
         var timeInfo = '';
@@ -755,19 +784,19 @@ function loadAdminData() {
             timeInfo = '<div style="font-size:12px;color:#888;margin-top:6px;">🕐 最近操作 ' + formatDate(new Date(lastUpdate)) + '</div>';
         }
         var tasksHtml = '';
-        for (var j = 0; j < 4; j++) {
+        for (var j = 0; j < 5; j++) {
             tasksHtml += '<div class="status-task ' + (tasks[j] ? 'done' : 'pending') + '"><span class="status-task-num">' + (tasks[j] ? '✓' : (j+1)) + '</span>' + TASK_LABELS[j+1] + '</div>';
         }
         html += '<div class="status-card ' + cardClass + '"><div class="status-name">👩 ' + parent.name + '<span style="font-size:13px;font-weight:400;color:#888;">· ' + parent.pos + '</span><span class="status-badge ' + badgeClass + '">' + badgeText + '</span></div><div class="status-tasks">' + tasksHtml + '</div>' + timeInfo + '</div>';
     }
     var totalDone = 0, allDoneCount = 0;
     for (var k = 0; k < PARENTS.length; k++) {
-        for (var m = 1; m <= 4; m++) {
+        for (var m = 1; m <= 5; m++) {
             if (localStorage.getItem(STORAGE_PREFIX + PARENTS[k].key + '_task' + m) === 'true') totalDone++;
         }
         if (localStorage.getItem(STORAGE_PREFIX + PARENTS[k].key + '_allDone') === 'true') allDoneCount++;
     }
-    var maxTasks = PARENTS.length * 4;
+    var maxTasks = PARENTS.length * 5;
     html += '<div class="summary-bar"><strong>📈 总体统计</strong><br>共 ' + PARENTS.length + ' 位家长 · ' + maxTasks + ' 个提醒项<br>已确认：<strong style="color:#22c55e;font-size:18px;">' + totalDone + '/' + maxTasks + '</strong> (' + Math.round(totalDone/maxTasks*100) + '%)<br>全部完成家长：<strong style="color:#22c55e;">' + allDoneCount + '/' + PARENTS.length + '</strong> 人</div>';
     document.getElementById('adminContent').innerHTML = html;
 }
