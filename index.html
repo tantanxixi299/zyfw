@@ -542,6 +542,7 @@
 
         <div style="text-align:center;margin-top:16px;">
             <button class="back-btn" onclick="resetView()">← 返回重新选择身份</button>
+            <button class="back-btn" onclick="clearMyData()" style="margin-left:8px;border-color:#ef4444;color:#ef4444;">🗑 清除我的数据</button>
         </div>
     </div>
 
@@ -1012,6 +1013,26 @@ function spawnBlast(side, colors, shapes, container) {
 
 function closeCelebrate() {
     document.getElementById('celebrateOverlay').classList.remove('show');
+}
+
+function clearMyData() {
+    if (!currentParent) return;
+    if (!confirm('确定要清除「' + currentParent.name + '」的所有打勾记录吗？此操作不可恢复。')) return;
+    for (var i = 1; i <= 5; i++) {
+        localStorage.removeItem(STORAGE_PREFIX + currentParent.key + '_task' + i);
+        localStorage.removeItem(STORAGE_PREFIX + currentParent.key + '_time_' + i);
+        var taskEl = document.getElementById('task' + i);
+        var checkEl = document.getElementById('check' + i);
+        taskEl.classList.remove('completed');
+        checkEl.querySelector('input[type="checkbox"]').checked = false;
+        updateTaskLockState(i);
+    }
+    localStorage.removeItem(STORAGE_PREFIX + currentParent.key + '_allDone');
+    localStorage.removeItem(STORAGE_PREFIX + currentParent.key + '_allDoneTime');
+    localStorage.removeItem(STORAGE_PREFIX + currentParent.key + '_lastUpdate');
+    updateProgress();
+    document.getElementById('completionMsg').classList.remove('show');
+    showToast('✅ 已清除，请重新打勾确认');
 }
 
 function resetView() {
