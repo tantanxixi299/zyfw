@@ -338,7 +338,7 @@
                 <div class="task-header">
                     <div style="display:flex;align-items:center;">
                         <span class="task-number">3</span>
-                        <span class="task-phase">👕 服务前一天准备</span>
+                        <span class="task-phase">👕 站岗当天确认</span>
                     </div>
                     <label class="custom-checkbox" id="check3">
                         <input type="checkbox" onchange="toggleTask(3)">
@@ -353,9 +353,12 @@
                         📝 领取时请同时在<strong>义工房会议桌上完成纸质签到</strong><br>
                         💡 提示：请务必在服务前领取好服装及用具，确保当天着装规范上岗。
                     </div>
+                    <div class="position-map" style="margin-top:12px;border-color:#fecaca;background:#fef2f2;">
+                        <img src="uniform.jpg" alt="志愿者正确着装示范：穿红马甲、戴红帽、手持红色指引旗">
+                    </div>
                     <div class="lock-hint" id="lock3">
                         <span class="lock-icon">🔒</span>
-                        <span>打勾时间：<strong>即日起至6月17日 12:00</strong> 前可确认</span>
+                        <span>打勾时间：<strong>6月17日（站岗当天）</strong> 可确认</span>
                     </div>
                 </div>
             </li>
@@ -488,7 +491,7 @@ const TASK_UNLOCK = [
     null,
     new Date(2026, 5, 10, 0, 0, 0),   // 任务1：6月10日起
     new Date(2026, 5, 10, 0, 0, 0),   // 任务2：6月10日起
-    new Date(2026, 5, 10, 0, 0, 0),   // 任务3：6月10日起
+    new Date(2026, 5, 17, 0, 0, 0),   // 任务3：6月17日（站岗当天）起
     new Date(2026, 5, 17, 16, 50, 0), // 任务4：6月17日 16:50
     new Date(2026, 5, 17, 17, 0, 0)  // 任务5：6月17日 17:00
 ];
@@ -498,7 +501,7 @@ const TASK_DEADLINE = [
     null,
     new Date(2026, 5, 17, 12, 0, 0),  // 任务1截止：6月17日 12:00
     new Date(2026, 5, 17, 12, 0, 0),  // 任务2截止：6月17日 12:00
-    new Date(2026, 5, 17, 12, 0, 0),  // 任务3截止：6月17日 12:00
+    null,                               // 任务3：站岗当天确认，无截止
     null, null
 ];
 
