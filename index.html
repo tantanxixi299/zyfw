@@ -151,6 +151,52 @@
         .completion-msg h3 { color: #22c55e; font-size: 20px; margin-bottom: 8px; }
         .completion-msg p { color: #666; font-size: 14px; }
 
+        /* 全屏庆祝效果 */
+        .celebrate-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 9990; justify-content: center; align-items: center;
+            pointer-events: none;
+        }
+        .celebrate-overlay.show { display: flex; }
+        .celebrate-card {
+            background: white; border-radius: 20px; padding: 32px 24px;
+            width: 90%; max-width: 380px; text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: celebratePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: auto; position: relative; z-index: 9991;
+        }
+        @keyframes celebratePop {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .celebrate-card .trophy { font-size: 64px; display: block; margin-bottom: 8px; animation: trophyBounce 0.6s ease 0.3s both; }
+        @keyframes trophyBounce {
+            0% { transform: translateY(-40px); opacity: 0; }
+            60% { transform: translateY(8px); }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .celebrate-card h2 { font-size: 22px; color: #333; margin-bottom: 6px; }
+        .celebrate-card .celeb-subtitle { font-size: 14px; color: #888; margin-bottom: 14px; line-height: 1.6; }
+        .celebrate-card .celeb-stars { font-size: 28px; letter-spacing: 4px; margin-bottom: 12px; }
+        .celebrate-card .celeb-btn {
+            display: inline-block; padding: 10px 28px;
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: white; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(245,158,11,0.4);
+        }
+        .celebrate-card .celeb-btn:active { transform: scale(0.95); }
+
+        /* 撒花粒子 */
+        .confetti {
+            position: fixed; z-index: 9992; pointer-events: none;
+            animation: confettiFall linear forwards;
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+        }
+
         /* 引导弹窗 */
         .guide-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -476,6 +522,18 @@
             <p>感谢您对学校交通安全工作的支持与配合<br>我们6月17日下午见！👋</p>
         </div>
 
+        <!-- 全屏庆祝效果 -->
+        <div class="celebrate-overlay" id="celebrateOverlay">
+            <div class="celebrate-card">
+                <span class="trophy">🏆</span>
+                <h2>全部确认完成！</h2>
+                <div class="celeb-stars">⭐⭐⭐⭐⭐</div>
+                <p class="celeb-subtitle">感谢您对学校交通安全工作的<br>支持与配合！</p>
+                <p style="font-size:13px;color:#f59e0b;font-weight:600;">我们6月17日下午见！👋</p>
+                <button class="celeb-btn" onclick="closeCelebrate()" style="margin-top:14px;">👍 收到</button>
+            </div>
+        </div>
+
         <div style="text-align:center;margin-top:16px;">
             <button class="back-btn" onclick="resetView()">← 返回重新选择身份</button>
         </div>
@@ -793,6 +851,8 @@ function updateProgress() {
         msg.classList.add('show');
         localStorage.setItem(STORAGE_PREFIX + currentParent.key + '_allDone', 'true');
         localStorage.setItem(STORAGE_PREFIX + currentParent.key + '_allDoneTime', new Date().toISOString());
+        // 触发全屏庆祝效果
+        showCelebrate();
     } else {
         msg.classList.remove('show');
         localStorage.removeItem(STORAGE_PREFIX + currentParent.key + '_allDone');
@@ -885,6 +945,37 @@ function loadAdminData() {
 function formatDate(d) {
     var pad = function(n) { return String(n).padStart(2, '0'); };
     return (d.getMonth()+1) + '/' + d.getDate() + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+// ========== 全屏庆祝效果 ==========
+function showCelebrate() {
+    // 撒花
+    var colors = ['#ef4444','#f59e0b','#22c55e','#3b82f6','#8b5cf6','#ec4899','#f97316','#06b6d4'];
+    var shapes = ['●','■','▲','★','♦','❤','🌸','🎉'];
+    var container = document.body;
+    for (var i = 0; i < 60; i++) {
+        setTimeout(function() {
+            var el = document.createElement('div');
+            el.className = 'confetti';
+            el.style.left = Math.random() * 100 + '%';
+            el.style.top = -(Math.random() * 60 + 20) + 'px';
+            el.style.fontSize = (Math.random() * 16 + 12) + 'px';
+            el.style.color = colors[Math.floor(Math.random() * colors.length)];
+            el.style.animationDuration = (Math.random() * 2 + 2.5) + 's';
+            el.style.animationDelay = '0s';
+            el.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+            container.appendChild(el);
+            setTimeout(function() { el.remove(); }, 3500);
+        }, i * 40);
+    }
+    // 弹出庆祝卡片
+    setTimeout(function() {
+        document.getElementById('celebrateOverlay').classList.add('show');
+    }, 600);
+}
+
+function closeCelebrate() {
+    document.getElementById('celebrateOverlay').classList.remove('show');
 }
 
 function resetView() {
